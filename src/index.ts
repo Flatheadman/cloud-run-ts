@@ -1,16 +1,29 @@
-import app from './app';
+// src/index.ts
+import express, { Request, Response } from 'express';
 
-const PORT = process.env.PORT || 8080;
+// 创建 Express 应用实例
+const app = express();
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// 定义根路由
+app.get('/', (req: Request, res: Response) => {
+  console.log('Request received for /');
+  res.status(200).send('Hello from TypeScript on Cloud Run!');
 });
 
-// Graceful shutdown
+// Cloud Run 要求服务监听 PORT 环境变量
+const port = process.env.PORT || 8080;
+
+// 启动服务器
+const server = app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
+// Cloud Run 会发送 SIGTERM 信号来正常关闭容器
+// 我们需要捕获这个信号以实现优雅停机
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
+  console.log('SIGTERM signal received: closing HTTP server');
   server.close(() => {
-    console.log('Process terminated');
+    console.log('HTTP server closed');
     process.exit(0);
   });
 });

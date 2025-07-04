@@ -1,0 +1,6 @@
+# Exclude git history and local node modules from Docker build context
+.git
+.gitignore
+node_modules
+dist
+README.md
